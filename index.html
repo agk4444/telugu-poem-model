@@ -27,7 +27,8 @@
         <input id="first-line" type="text" maxlength="200" placeholder="అన్న మిడుట కన్న నధిక దానంబుల" aria-describedby="hint">
         <button type="submit" id="generate-btn">Generate</button>
       </div>
-      <p id="hint" class="hint">One line is enough — the model writes the rest. Telugu only.</p>
+      <p id="hint" class="hint">One line is enough — the model writes the rest. Type in Telugu, or in English letters and we'll convert it.</p>
+      <p id="roman-preview" class="preview" hidden></p>
     </form>
 
     <div class="chips" id="chips" aria-label="Try a first line">
@@ -61,6 +62,7 @@
     <p>Runs on CPU via llama.cpp (GGUF Q8_0, ~285 MB). No data leaves this server.</p>
   </footer>
 </div>
+<script src="assets/transliterate.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

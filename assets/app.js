@@ -8,6 +8,7 @@
   var poemEl = document.getElementById('poem');
   var meaningWrap = document.getElementById('meaning-wrap');
   var meaningEl = document.getElementById('meaning');
+  var previewEl = document.getElementById('roman-preview');
 
   function showError(msg) {
     errorEl.textContent = msg;
@@ -16,14 +17,20 @@
   }
 
   function generate(firstLine) {
-    // The model was trained on Telugu script only; Roman letters
-    // ("Medi pandu") confuse it into garbled output. Ask for Telugu
-    // script instead of letting it guess.
-    if (!/[\u0C00-\u0C7F]/.test(firstLine)) {
+    var line = firstLine;
+    // Roman letters are converted to Telugu script first ("Medi pandu"
+    // -> మేడి పండు); the model only reads Telugu script. The converted
+    // line is shown in the input, so the user sees what was sent.
+    if (!/[\u0C00-\u0C7F]/.test(line) && /[A-Za-z]/.test(line) &&
+        typeof transliterateRomanTelugu === 'function') {
+      line = transliterateRomanTelugu(line);
+    }
+    if (!/[\u0C00-\u0C7F]/.test(line)) {
       showError('Please type the first line in Telugu script — this model reads Telugu letters, not English ones.');
       return;
     }
-    input.value = firstLine;
+    input.value = line;
+    previewEl.hidden = true;
     errorEl.hidden = true;
     resultEl.hidden = true;
     statusEl.hidden = false;
@@ -32,7 +39,7 @@
     fetch('ask.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ first_line: firstLine })
+      body: JSON.stringify({ first_line: line })
     })
       .then(function (resp) { return resp.json().then(function (data) { return { ok: resp.ok, data: data }; }); })
       .then(function (res) {
@@ -66,6 +73,22 @@
     var line = input.value.trim();
     if (!line) { input.focus(); return; }
     generate(line);
+  });
+
+  // Live preview: as Roman letters are typed, show the Telugu they will
+  // become, so a wrong conversion is visible before generating.
+  input.addEventListener('input', function () {
+    var v = input.value.trim();
+    if (/[A-Za-z]/.test(v) && !/[\u0C00-\u0C7F]/.test(v) &&
+        typeof transliterateRomanTelugu === 'function') {
+      var converted = transliterateRomanTelugu(v);
+      if (/[\u0C00-\u0C7F]/.test(converted) && converted !== v) {
+        previewEl.textContent = converted;
+        previewEl.hidden = false;
+        return;
+      }
+    }
+    previewEl.hidden = true;
   });
 
   document.getElementById('chips').addEventListener('click', function (e) {
