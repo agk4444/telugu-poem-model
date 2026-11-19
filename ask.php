@@ -113,6 +113,11 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array(
     'prompt' => $prompt,
     'temperature' => 0,
     'n_predict' => 200,
+    // Greedy decoding loops in the meaning section; a gentle repeat
+    // penalty breaks the tightest loops (verified Nov 19: the meaning
+    // gets more varied before it loops, the poem itself is unchanged).
+    'repeat_penalty' => 1.1,
+    'repeat_last_n' => 64,
 )));
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 curl_setopt($ch, CURLOPT_TIMEOUT, 100);
@@ -133,6 +138,36 @@ if ($completion === '') {
     fail(502, 'The poem service returned an empty poem. Please try again.');
 }
 
+// The meaning still loops eventually (the model has no stop for it), so
+// cut the meaning at its first repeated sentence. The poem itself is
+// untouched — only the meaning is trimmed.
+function trim_repeated_sentences($text)
+{
+    $parts = preg_split('/(?<=[.!?।])\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+    if ($parts === false || count($parts) <= 1) {
+        return $text;
+    }
+    $seen = array();
+    $kept = array();
+    foreach ($parts as $s) {
+        $s = trim($s);
+        if ($s === '') {
+            continue;
+        }
+        $key = preg_replace('/\s+/u', ' ', $s);
+        $key = trim($key, " \t\n\r\0\x0B\"'”");
+        if (isset($seen[$key])) {
+            break;
+        }
+        $seen[$key] = true;
+        $kept[] = $s;
+    }
+    if (count($kept) === 0) {
+        return $text;
+    }
+    return implode(' ', $kept);
+}
+
 // The model appends a meaning section after "అర్థం:" — split it out so
 // the page can show the poem and its meaning separately.
 $poem = $completion;
@@ -149,6 +184,8 @@ if ($pos !== false) {
     ));
     if ($meaning === '') {
         $meaning = null;
+    } else {
+        $meaning = trim_repeated_sentences($meaning);
     }
 }
 
