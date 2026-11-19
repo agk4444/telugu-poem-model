@@ -1,0 +1,13 @@
+# Telugu poem model — one container, llama-server on loopback only.
+# Mirrors the box's embedding service (Docker, port 8797); this one uses
+# 8798 so the two never collide.
+services:
+  poem-model:
+    build: .
+    image: telugu-poem-model:latest
+    container_name: telugu-poem-model
+    ports:
+      # Host side is loopback-only: the model is reachable from this box
+      # and nowhere else.
+      - "127.0.0.1:8798:8798"
+    restart: unless-stopped

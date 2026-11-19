@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telugu Poems — Vemana-style verse, written by a small model</title>
+<meta name="description" content="Give the first line of a Telugu poem and a small fine-tuned model (278M) finishes it in Vemana's style, with a meaning. Runs on CPU.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237a2e1d'/%3E%3Ctext x='32' y='45' font-size='36' text-anchor='middle' fill='%23faf6ee' font-family='serif'%3E%E0%B0%AA%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Udgam Vemana-Base &middot; fine-tuned on 15,361 Telugu poems</p>
+    <h1>తెలుగు పద్యాలు</h1>
+    <p class="rule" aria-hidden="true"><span></span></p>
+    <p class="subtitle">Give the first line of a poem and a small model (278M parameters) finishes it in Vemana's style — four lines, the traditional closing refrain, and a meaning. It runs on an ordinary CPU.</p>
+  </header>
+
+  <main>
+    <form id="poem-form" autocomplete="off">
+      <label for="first-line">First line of the poem</label>
+      <div class="ask-row">
+        <input id="first-line" type="text" maxlength="200" placeholder="అన్న మిడుట కన్న నధిక దానంబుల" aria-describedby="hint">
+        <button type="submit" id="generate-btn">Generate</button>
+      </div>
+      <p id="hint" class="hint">One line is enough — the model writes the rest. Telugu only.</p>
+    </form>
+
+    <div class="chips" id="chips" aria-label="Try a first line">
+      <button type="button" data-line="అన్న మిడుట కన్న నధిక దానంబుల">అన్న మిడుట కన్న… (Vemana)</button>
+      <button type="button" data-line="వాన కురిసె మబ్బు గర్జించె">వాన కురిసె… (rain)</button>
+    </div>
+
+    <section id="status" class="status" hidden>
+      <p class="reading"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Composing…</p>
+    </section>
+
+    <section id="error" class="error" hidden></section>
+
+    <section id="result" class="result" hidden>
+      <p class="from-model">The model wrote</p>
+      <div id="poem" class="poem"></div>
+      <div id="meaning-wrap" hidden>
+        <h2>Meaning</h2>
+        <div id="meaning" class="meaning"></div>
+      </div>
+    </section>
+
+    <details class="how">
+      <summary>An honest note</summary>
+      <p>The model writes in Vemana's style and invents lines — it does not quote poems it has never seen word-for-word (0 out of 40 on a held-out test). Treat its poems as new verse in the old form, not as quotations. For exact quotes from the real poems, use the <a href="https://vemana.socialnews.xyz">Vemana RAG</a>, which retrieves the actual text.</p>
+    </details>
+  </main>
+
+  <footer>
+    <p>Model: <a href="https://huggingface.co/agk4444/telugu-poem-model">agk4444/telugu-poem-model</a> — Udgam Vemana-Base (278M) fine-tuned on 15,361 Telugu poems. Developed by AGK FIRE INC.</p>
+    <p>Runs on CPU via llama.cpp (GGUF Q8_0, ~285 MB). No data leaves this server.</p>
+  </footer>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>
