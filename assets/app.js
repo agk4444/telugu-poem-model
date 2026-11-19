@@ -16,6 +16,13 @@
   }
 
   function generate(firstLine) {
+    // The model was trained on Telugu script only; Roman letters
+    // ("Medi pandu") confuse it into garbled output. Ask for Telugu
+    // script instead of letting it guess.
+    if (!/[\u0C00-\u0C7F]/.test(firstLine)) {
+      showError('Please type the first line in Telugu script — this model reads Telugu letters, not English ones.');
+      return;
+    }
     input.value = firstLine;
     errorEl.hidden = true;
     resultEl.hidden = true;

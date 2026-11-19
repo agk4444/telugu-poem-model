@@ -98,6 +98,12 @@ if ($first_line === '') {
 if (mb_strlen($first_line, 'UTF-8') > MAX_LINE_CHARS) {
     fail(400, 'Please keep the first line under 200 characters.');
 }
+// The model was trained on Telugu script only; Roman letters
+// ("Medi pandu") confuse it into garbled output. Require at least one
+// Telugu character instead of letting it guess.
+if (!preg_match('/[\x{0C00}-\x{0C7F}]/u', $first_line)) {
+    fail(400, 'Please type the first line in Telugu script — this model reads Telugu letters, not English ones.');
+}
 
 // Same cue format the model was trained and tested on.
 $prompt = "మొదటి పాదం: {$first_line}\nపూర్తి పద్యం:\n";
