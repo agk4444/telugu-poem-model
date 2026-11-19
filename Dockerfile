@@ -10,7 +10,7 @@ FROM ubuntu:22.04
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates curl \
+        ca-certificates curl libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 ARG LLAMA_VERSION=b12547
@@ -25,7 +25,7 @@ RUN mkdir -p /opt/llama /models \
     && rm /tmp/llama.tar.gz \
     && curl -fsSL -o /models/telugu-poem-model-q8_0.gguf "${GGUF_URL}" \
     && echo "${GGUF_SHA256}  /models/telugu-poem-model-q8_0.gguf" | sha256sum -c - \
-    && /opt/llama/llama-server --version || true
+    && /opt/llama/llama-server --version
 
 EXPOSE 8798
 
